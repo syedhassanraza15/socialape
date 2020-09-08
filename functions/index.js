@@ -1,14 +1,14 @@
 const functions = require("firebase-functions");
 const app = require("express")();
 
-const { getAllScreams, postOneScream } = require('./handlers/screams');
+const { getAllScreams, postOneScream } = require("./handlers/screams");
 
 //const firebase = require("firebase");
 //const e = require("express");
-const { signup, login } = require("./handlers/users");
+const { signup, login, uploadImage } = require("./handlers/users"); //("./handlers/users");
 //firebase.initializeApp(firebaseConfig);
 
-const middleWareAuthentication = require('./util/middleWareAuthentication');
+const middleWareAuthentication = require("./util/middleWareAuthentication");
 
 //All Routes
 //Screams GET route
@@ -21,6 +21,9 @@ app.post("/scream", middleWareAuthentication, postOneScream);
 app.post("/signup", signup);
 //Login route
 app.post("/login", login);
+
+//image upload route
+app.post("/user/image", middleWareAuthentication, uploadImage);
 
 //www.baseurl.com/api/screams
 exports.api = functions.https.onRequest(app);
