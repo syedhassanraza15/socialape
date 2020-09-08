@@ -27,4 +27,4 @@ app.post("/user/image", middleWareAuthentication, uploadImage);
 
 //www.baseurl.com/api/screams
 exports.api = functions.https.onRequest(app); 
-//comment end
+//comment ended
