@@ -5,7 +5,7 @@ const { getAllScreams, postOneScream } = require("./handlers/screams");
 
 //const firebase = require("firebase");
 //const e = require("express");
-const { signup, login, uploadImage } = require("./handlers/users"); //("./handlers/users");
+const { signup, login, uploadImage, addUserDetails, getAuthenticatedUser } = require("./handlers/users"); //("./handlers/users");
 //firebase.initializeApp(firebaseConfig);
 
 const middleWareAuthentication = require("./util/middleWareAuthentication");
@@ -24,6 +24,11 @@ app.post("/login", login);
 
 //image upload route
 app.post("/user/image", middleWareAuthentication, uploadImage);
+
+//user details route
+app.post("/user", middleWareAuthentication, addUserDetails);
+
+app.get('/user', middleWareAuthentication, getAuthenticatedUser);
 
 //www.baseurl.com/api/screams
 exports.api = functions.https.onRequest(app); 
