@@ -1,7 +1,7 @@
 const functions = require("firebase-functions");
 const app = require("express")();
 
-const { getAllScreams, postOneScream, getScream, commentOnScream } = require("./handlers/screams");
+const { getAllScreams, postOneScream, getScream, commentOnScream, likeScream, unLikeScream, deleteScream } = require("./handlers/screams");
 
 //const firebase = require("firebase");
 //const e = require("express");
@@ -28,10 +28,16 @@ app.get('/user', middleWareAuthentication, getAuthenticatedUser);
 
 //
 app.get('/scream/:screamId', getScream);
-// TODO: delete scream
-// TODO: like a scream
-// TODO: unlike a scream
-// TODO: comment on scream
+
+//delete scream
+app.delete('/scream/:screamId', middleWareAuthentication, deleteScream);
+
+//like a scream
+app.get('/scream/:screamId/like', middleWareAuthentication, likeScream);
+
+//unlike a scream
+app.get('/scream/:screamId/unlike', middleWareAuthentication, unLikeScream);
+//comment on scream
 app.post('/scream/:screamId/comment', middleWareAuthentication, commentOnScream);
 
 //User routes Signup and Login
@@ -39,5 +45,5 @@ app.post("/signup", signup);
 app.post("/login", login);
 
 //www.baseurl.com/api/(anyroute)
-exports.api = functions.https.onRequest(app); 
+exports.api = functions.https.onRequest(app);
 //comment ended
