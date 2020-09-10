@@ -41,11 +41,13 @@ exports.signup = (req, res) => {
     })
     .then((idToken) => {
       token = idToken;
+      //let imageFileName;
       const userCredentials = {
         handle: newUser.handle,
         email: newUser.email,
         createdAt: new Date().toISOString(),
-        imageUrl: `https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/socialApeDP-${imageFileName}?alt=media`,
+        imageUrl: `https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/blank-avatar.png?alt=media`, 
+        //`https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/socialApeDP-${imageFileName}?alt=media`,
         userId,
       };
       return db.doc(`/users/${newUser.handle}`).set(userCredentials);
@@ -179,7 +181,24 @@ exports.getAuthenticatedUser = (req, res) => {
       data.forEach(doc => {
         userData.likes.push(doc.data());
       });
-      return res.json(userData);
+      //return res.json(userData);
+      return db.collection('notifications').where('recipient', '==', req.user.handle)
+        .orderBy('createdAt', 'desc').limit(10).get();
+    })
+    .then(data => {
+      userData.notifications = [];
+      data.forEach(doc => {
+        userData.notifications.push({
+          recipient: doc.data().recipient,
+          sender: doc.data().sender,
+          createdAt: doc.data().createdAt,
+          screamId: doc.data().screamId,
+          type: doc.data().type,
+          read: doc.data().read,
+          notificationId: doc.id
+        });
+      });
+      return res.json(userData)
     })
     .catch(err => {
       console.error(err);

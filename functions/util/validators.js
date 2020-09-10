@@ -13,6 +13,7 @@ const isEmailValid = (email) => {
 
 exports.validateSignupData = (data) => {
   let = {};
+  let errors = {};
 
   if (isEmpty(data.email)) {
     errors.email = "Must not be empty";

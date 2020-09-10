@@ -1,6 +1,8 @@
 const functions = require("firebase-functions");
 const app = require("express")();
 
+const { db } = require('./util/admin');
+
 const { getAllScreams, postOneScream, getScream, commentOnScream, likeScream, unLikeScream, deleteScream } = require("./handlers/screams");
 
 //const firebase = require("firebase");
@@ -44,6 +46,71 @@ app.post('/scream/:screamId/comment', middleWareAuthentication, commentOnScream)
 app.post("/signup", signup);
 app.post("/login", login);
 
+//creating notification on like
+exports.createNotificationOnLike = functions.region('europe-west1').firestore.document('likes/{id}')
+    .onCreate((snapshot) => {
+        db.doc(`/screams/${snapshot.data().screamId}`).get()
+            .then(doc => {
+                if (doc.exists) {
+                    return db.doc(`/notifications/${snapshot.id}`).set({
+                        createdAt: new Date().toISOString(),
+                        recipient: doc.data().userHandle,
+                        sender: snapshot.data().userHandle,
+                        type: 'like',
+                        read: false,
+                        screamId: doc.id
+                    });
+                }
+            })
+            .then(() => {
+                return;
+            })
+            .catch((err) => {
+                console.error(err);
+                return;
+            })
+    })
+
+//delete the notification on unlike
+exports.deleteNotificationOnUnlike = functions
+    .region('europe-west1').firestore.document('likes/{id}')
+    .onDelete((snapshot) => {
+        db.doc(`/notifications/${snapshot.id}`)
+            .delete()
+            .then(() => {
+                return;
+            })
+            .catch(err => {
+                console.error(err);
+                return;
+            })
+    })
+
+//creating notification on comment
+exports.createNotificationOnComment = functions.region('europe-west1').firestore.document('comments/{id}')
+    .onCreate((snapshot) => {
+        db.doc(`/screams/${snapshot.data().screamId}`).get()
+            .then(doc => {
+                if (doc.exists) {
+                    return db.doc(`/notifications/${snapshot.id}`).set({
+                        createdAt: new Date().toISOString(),
+                        recipient: doc.data().userHandle,
+                        sender: snapshot.data().userHandle,
+                        type: 'comment',
+                        read: false,
+                        screamId: doc.id
+                    });
+                }
+            })
+            .then(() => {
+                return;
+            })
+            .catch((err) => {
+                console.error(err);
+                return;
+            })
+    })
+
 //www.baseurl.com/api/(anyroute)
-exports.api = functions.https.onRequest(app);
+exports.api = functions.region('europe-west1').https.onRequest(app); //exports.api = functions.https.onRequest(app);
 //comment ended
