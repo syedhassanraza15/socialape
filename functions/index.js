@@ -54,9 +54,11 @@ app.get('/user/:handle', getUserDetails);
 //creating notification on like
 exports.createNotificationOnLike = functions.region('europe-west1').firestore.document('likes/{id}')
     .onCreate((snapshot) => {
-        db.doc(`/screams/${snapshot.data().screamId}`).get()
+        return db.doc(`/screams/${snapshot.data().screamId}`).get()
             .then(doc => {
-                if (doc.exists) {
+                if (doc.exists && doc.data().userHandle !== snapshot.data().userHandle) {
+                    // in the above if the 2nd check is for the thing that user don't get notified 
+                    //on liking his own post
                     return db.doc(`/notifications/${snapshot.id}`).set({
                         createdAt: new Date().toISOString(),
                         recipient: doc.data().userHandle,
@@ -67,12 +69,8 @@ exports.createNotificationOnLike = functions.region('europe-west1').firestore.do
                     });
                 }
             })
-            .then(() => {
-                return;
-            })
             .catch((err) => {
                 console.error(err);
-                return;
             })
     })
 
@@ -80,11 +78,8 @@ exports.createNotificationOnLike = functions.region('europe-west1').firestore.do
 exports.deleteNotificationOnUnlike = functions
     .region('europe-west1').firestore.document('likes/{id}')
     .onDelete((snapshot) => {
-        db.doc(`/notifications/${snapshot.id}`)
+        return db.doc(`/notifications/${snapshot.id}`)
             .delete()
-            .then(() => {
-                return;
-            })
             .catch(err => {
                 console.error(err);
                 return;
@@ -94,9 +89,11 @@ exports.deleteNotificationOnUnlike = functions
 //creating notification on comment
 exports.createNotificationOnComment = functions.region('europe-west1').firestore.document('comments/{id}')
     .onCreate((snapshot) => {
-        db.doc(`/screams/${snapshot.data().screamId}`).get()
+        return db.doc(`/screams/${snapshot.data().screamId}`).get()
             .then(doc => {
-                if (doc.exists) {
+                if (doc.exists && doc.data().userHandle !== snapshot.data().userHandle) {
+                    // in the above if the 2nd check is for the thing that user don't get notified 
+                    //on commenting on his own post
                     return db.doc(`/notifications/${snapshot.id}`).set({
                         createdAt: new Date().toISOString(),
                         recipient: doc.data().userHandle,
@@ -106,9 +103,6 @@ exports.createNotificationOnComment = functions.region('europe-west1').firestore
                         screamId: doc.id
                     });
                 }
-            })
-            .then(() => {
-                return;
             })
             .catch((err) => {
                 console.error(err);
