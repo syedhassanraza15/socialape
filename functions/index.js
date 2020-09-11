@@ -7,7 +7,7 @@ const { getAllScreams, postOneScream, getScream, commentOnScream, likeScream, un
 
 //const firebase = require("firebase");
 //const e = require("express");
-const { signup, login, uploadImage, addUserDetails, getAuthenticatedUser } = require("./handlers/users"); //("./handlers/users");
+const { signup, login, uploadImage, addUserDetails, getAuthenticatedUser, getUserDetails, markNotificationsRead } = require("./handlers/users"); //("./handlers/users");
 //firebase.initializeApp(firebaseConfig);
 
 const middleWareAuthentication = require("./util/middleWareAuthentication");
@@ -45,6 +45,11 @@ app.post('/scream/:screamId/comment', middleWareAuthentication, commentOnScream)
 //User routes Signup and Login
 app.post("/signup", signup);
 app.post("/login", login);
+
+app.post('/notifications', middleWareAuthentication, markNotificationsRead);
+
+//any users public details this is a public route so not needed middleWareAuthentication
+app.get('/user/:handle', getUserDetails);
 
 //creating notification on like
 exports.createNotificationOnLike = functions.region('europe-west1').firestore.document('likes/{id}')
