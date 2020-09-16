@@ -18,7 +18,8 @@ let db = {
             body: 'This is the sample scream body',
             createdAt: '2020-09-01T15:10:47.984Z',
             likeCount: 5,
-            commentCount: 2
+            commentCount: 2,
+            userImage: "https://url.com"
         }
     ],
     comments: [
